@@ -1,0 +1,49 @@
+version: '3.3'
+
+services:
+    php:
+        build:
+            context: ./docker
+            dockerfile: Dockerfile
+        container_name: my-php
+        depends_on:
+          - database
+        volumes:
+            - './ProjetSchool:/var/www/html:cached'
+
+    nginx:
+        image: 'nginx:1.21.6'
+        container_name: my-nginx
+        ports:
+            - '81:80'
+            # - '443:443'
+        links:
+            - 'php'
+        volumes:
+            - './ProjetSchool:/var/www/html:cached'
+            - './config/nginx:/etc/nginx/conf.d:cached'
+
+    vuejs:
+        image: vuejs
+        container_name: vue-container
+        ports:
+            - '83:8080'
+        volumes:
+            - './ProjectSchool-Front:/app:cached'
+
+    database:
+        image: 'mariadb:10.7.3'
+        container_name: my-database
+        restart: 'on-failure'
+        ports:
+            - "3306:3306"
+        environment:
+            MARIADB_ROOT_PASSWORD: root
+            MARIADB_DATABASE: api
+
+networks:
+    default: 
+        name: alaji
+
+
+
